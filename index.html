@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Fjalla+One&display=swap" rel="stylesheet">
     <!-- favicon -->
-    <link rel="icon" href="img/ai.png" sizes="32x32" type="image/png"> 
+    <link rel="icon" href="img/intellectual.png" sizes="32x32" type="image/png"> 
     <link rel="stylesheet" href="app.css" />
 </head>
 <body>
@@ -23,11 +23,13 @@
                  <h1>| Trivia Crunch | &trade;</h1> 
                 <br>
                 <p>a minimalist trivia app.</p>
+                <button class="restart">Start a New Game.</button>
                 </div>
             <div class="body">
-                        <form></form>
-                        <h1>Choose.</h1>
-                       <input type="number" class="numQuestions" min="1" max="50">
+                        <h1 class="choose">Choose.</h1>
+                        <p class="label">26</p>
+                        <input class="numQuestions" type="range" min="1" max="50" step="1">
+                      
                         <select class="dropdownCategory">
                                 <!-- <option selected="x" hidden> Choose Category</option> -->
                                 <option value="x">Any Category</option>
@@ -56,6 +58,7 @@
                                 <option value="31">Entertainment: Japanese Anime and Manga</option>
                                 <option value="32">Entertainment: Cartoons and Animations</option>
                               </select>
+                        <div class="space"></div>
                         <br>
                         <select class="dropdownDifficulty">
                             <option value="x">Any Difficulty</option>
@@ -63,14 +66,20 @@
                             <option value="medium">Medium</option>
                             <option value="hard">Hard</option>
                         </select>
+                        <div class="space"></div>
                         <br>
                         <select class="dropdownType">
                                 <option value="x">Any Type</option>
                                 <option value="multiple">Multiple Choice</option>
                                 <option value="boolean">True/False</option>
                             </select>
+                        <div class="space"></div>
                         <br>
                         <button class="button" href="#">ENTER</button>           
+            </div>
+            <div class="mainGame hide">
+                   
+                </div>
             </div>
     </div>
     
