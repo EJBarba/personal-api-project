@@ -19,7 +19,6 @@ function convertToUrl( amount, category, difficulty, type) {
      category = category ==  'x' ? '' : `&category=${category}`;
      difficulty = difficulty =='x' ? '' : `&difficulty=${difficulty}`;
      type = type == 'x' ? '' : `&type=${type}`;
-    console.log('yo');
     return (`${baseUrl}${amount}${category}${difficulty}${type}`);
 }
 
@@ -34,6 +33,7 @@ var amount = ''; // required // no. of questions
 var category = '';  
 var difficulty = ''; // easy || medium || hard
 var type = ''; //multiple choice (multiple) || true/false (boolean)
+
 
 $('.button').on('click',() => {
 
@@ -78,20 +78,28 @@ function removeCard(){
 
 //restart game
 $('.restart').on('click', () => {
+    $('.restart').addClass('hide');
     $( ".body" ).fadeIn();
     $('.showNext').removeClass('hide');
     removeCard();
+    $('.showNext').addClass('hide');
+    $('.showChoices').addClass('hide');
+    $('.showChoices').text(' ');
+    $('.showQuestion').text(' ');
+    $('.showIcon').attr("src",`#`);
 });
 
 //shows next question
 function showCard(resultsArray, questionAt){
     //resets the card
+    enableClicks();
+    turnNormal();
     $('.showNext').addClass('hide');
     $('.showChoices').text('#');
     $('.showChoices').removeClass('hide');
     $('.restart').addClass('hide');
     console.log(resultsArray);
-    console.log(questionAt);
+    console.log('%cQUESTION AT ' + questionAt,"color:red; font-size:20px;" );
     let showAll = resultsArray[questionAt];
     let category = showAll.category;
     let difficulty = showAll.difficulty;
@@ -133,29 +141,72 @@ function showCard(resultsArray, questionAt){
 
 } 
 
-function showEnd(questionAt){
+function showEnd(questionAt,score, length){
     //resets the card
+    console.log('%cRESTART','color:orange; font-size:20px;');
     $('.showNext').addClass('hide');
     $('.showChoices').text('#');
     $('.restart').removeClass('hide');
     $('.showChoices').addClass('hide');
-    fetch('https://api.kanye.rest/') // get a random Kanye West quote
-    .then(res => res.json())
-    .then(res => $('.showQuestion').html(`${res.quote} <br> -Kanye West`).text());
+    $('.showQuestion').html(`Have a nice Day!`).text();
+    // fetch('https://api.kanye.rest/') // get a random Kanye West quote
+    //     .then(res => res.json())
+    //     .then(res => $('.showQuestion').html(`${res.quote} <br> -Kanye West`).text());
+   
     
     $('.showIcon').attr("src",`img/winner.png`);
-    $('.showCategory').text(`You answered ${questionAt}`); 
+    $('.showCategory').text(`You answered ${score} / ${questionAt} `); 
 }
 
+function turnNormal(){
+    $('div.showChoices').css({
+        "background-color": "white",
+        "font-weight": "normal",
+        "color":"#37474F"
+      });
+}
+
+function turnGreen(correct_answer){
+    $('div.showChoices').css({
+        "background-color": "#D3D3D3",
+        "font-weight": "bolder"
+      });
+      $(`div.showChoices:contains(${correct_answer})`).css({
+        "background-color": "green",
+        "color": "white",
+        "font-weight": "bolder"
+      });
+} 
+
+function turnRed(correct_answer){
+    $('div.showChoices').css({
+        "background-color": "red",
+        "font-weight": "bolder",
+        "color": "#D3D3D3",
+      });
+      $(`div.showChoices:contains(${correct_answer})`).css({
+        "background-color": "#FFFACD",
+        "font-weight": "bolder",
+        "color": "#37474F",
+      });
+} 
+
 function disableClicks(){
-    //pointer-events:none;
     $('.showChoices').css( "pointer-events", "none" );
-    alert('disabled');
 }
 
 function enableClicks(){
     $('.showChoices').css( "pointer-events", "auto" );
 }
+var score = 0;
+
+function resetScore(){
+    score = 0;
+}
+function addScore(){
+    score += 1;
+}
+    
 
 function getRequest(newUrl){
     const request = async () => {
@@ -177,11 +228,14 @@ function getRequest(newUrl){
             removeBody();
             let theCards = json.results;
             var questionAt = 0;
+            score = 0; 
             showCard(theCards,questionAt);
              //shows next question
              $('.showNext').on('click', () => {
                  if(questionAt == theCards.length - 1){ // user answered all questions
-                     showEnd(questionAt + 1);
+                    let len = theCards.length -1;
+                     showEnd(questionAt + 1, score, len);
+                     console.log('%cQUESTION AT ' + len,"color:tomato; font-weight: bold; font-size:20px;" );
                  }
                  else{
                     questionAt += 1;
@@ -189,19 +243,25 @@ function getRequest(newUrl){
                     console.log('correct' + theCards[questionAt].correct_answer);
                  }
             });
+            
             $('div.showChoices').off('click').on('click',function() {
                 var text = $(this).text();
                 console.log(text);
                 
                 if(theCards[questionAt].correct_answer == text){
-                    alert('u got it');
-                    // turnGreen(this)
+                    addScore();
+                    console.log("%c SCOOORE" + score,'color:blue; font-weight: bold; font-size: 20px');
                     $('.showNext').removeClass('hide');
                     $('.restart').addClass('hide');
+                    disableClicks();
+                    turnGreen(theCards[questionAt].correct_answer);
                 }
                 else{
-                    $('.restart').removeClass('hide');
+                    $('.showNext').removeClass('hide');
+                    //$('.restart').removeClass('hide');
                     disableClicks();
+                    turnRed(theCards[questionAt].correct_answer);
+                    
                 }
             });          
         }
