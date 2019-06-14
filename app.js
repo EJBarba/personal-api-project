@@ -47,22 +47,49 @@ $('.button').on('click',() => {
     getRequest(newUrl);
 });
 
-//restart game
-$('.restart').on('click', () => {
- 
-    $( ".body" ).fadeIn();
-});
+
 
 function removeBody(){
-    $('.body').fadeOut();
-    setTimeout(() => {
-        $('.mainGame').fadeIn();
-    }, 2000)
+    $('div.body').fadeOut(500, function() {
+        $(this).addClass("flex");
+        $(this).addClass("hide");
+    });
+    setTimeout(function(){ 
+        $('div.mainGame').fadeIn(500, function() {
+            $(this).removeClass("hide");
+        });    
+     }, 500);
+   
+}
+function removeCard(){
+    $('.showNext').addClass('hide');
+    $('div.mainGame').fadeOut(500, function() {
+        $(this).addClass("hide");
+    });
+    setTimeout(function(){ 
+        $('div.body').fadeIn(500, function() {
+            $(this).addClass("flex");
+            $(this).removeClass("hide");
+        
+        });    
+     }, 200);
     
 }
 
+//restart game
+$('.restart').on('click', () => {
+    $( ".body" ).fadeIn();
+    $('.showNext').removeClass('hide');
+    removeCard();
+});
+
 //shows next question
 function showCard(resultsArray, questionAt){
+    //resets the card
+    $('.showNext').addClass('hide');
+    $('.showChoices').text('#');
+    $('.showChoices').removeClass('hide');
+    $('.restart').addClass('hide');
     console.log(resultsArray);
     console.log(questionAt);
     let showAll = resultsArray[questionAt];
@@ -71,7 +98,7 @@ function showCard(resultsArray, questionAt){
     let question = showAll.question;
     let correct_answer = showAll.correct_answer;
     let incorrect_answers = showAll.incorrect_answers;  
-
+    let type = showAll.type;
     function shuffle(array) {
         array.sort(() => Math.random() - 0.5);
       }
@@ -83,54 +110,53 @@ function showCard(resultsArray, questionAt){
         choice.push(element);
         shuffle(choice);
     });
+    
+    
+    $('.showIcon').attr("src",`img/${category}.png`);
+    $('.showCategory').text(`${category} || ${difficulty}`); 
+    $('.showDifficulty').text(`${difficulty}`);
+    $('.showQuestion').html(question).text();
     console.log(choice);
-    function getChoices(){
-        choice.forEach(element =>{
-            let x = `<div class="showChoices">${element}</div>`
-            $('.mainGame').append(x);
-        });  
+    choice.forEach((element, index) =>{
+        $(`#${index}`).html(element).text();
+    });  
+    
+    if(type == 'boolean'){
+        $('#2').addClass('hide');
+        $('#3').addClass('hide');
+    }
+    if(type == 'multiple'){
+        $('#2').removeClass('hide');
+        $('#3').removeClass('hide');
     }
    
-    
-    var getNext = $('.showNext').detach();
-    let card = `
-    <img class="showIcon" src="img/${category}.png" alt="">
-    <h4 class="showCategory">${category} <span>| | </span> <span class="showDifficulty">${difficulty}</span></h4>
-    <h1 class="showQuestion">${question}</h1>`;
-    
-    let firstQuestion = `<div class="showNext">Next Question -> </div>`;
-    if (questionAt < 1){
-        $('.mainGame').append(card);
-        getChoices();
-        $('.mainGame').append(firstQuestion);
-       
-        console.log('f')
-    }
-    else{
-        $('.mainGame').empty();
-        $('.mainGame').append(card);
-        getChoices();
-        $('.mainGame').append(getNext);
-        $('div.showChoices').bind( "click", function() {
-            var text = $(this).text();
-            console.log(text);
-            // do something with the text
-            console.log(questionAt);
-          });
-        console.log("next");
-    }
-    
+
 } 
 
+function showEnd(questionAt){
+    //resets the card
+    $('.showNext').addClass('hide');
+    $('.showChoices').text('#');
+    $('.restart').removeClass('hide');
+    $('.showChoices').addClass('hide');
+    fetch('https://api.kanye.rest/') // get a random Kanye West quote
+    .then(res => res.json())
+    .then(res => $('.showQuestion').html(`${res.quote} <br> -Kanye West`).text());
+    
+    $('.showIcon').attr("src",`img/winner.png`);
+    $('.showCategory').text(`You answered ${questionAt}`); 
+}
 
-// function turnGreen(correctAnswer){
-    
-//     $(".mainGame").css("border", "15px solid  green");
-//     $('.showChoices').css("border", "5px solid  red");
-//     $(correctAnswer).css("border", "5px solid  green");
-//     $(correctAnswer).css('background-color', 'green');
-    
-// }
+function disableClicks(){
+    //pointer-events:none;
+    $('.showChoices').css( "pointer-events", "none" );
+    alert('disabled');
+}
+
+function enableClicks(){
+    $('.showChoices').css( "pointer-events", "auto" );
+}
+
 function getRequest(newUrl){
     const request = async () => {
         const response = await fetch(newUrl);
@@ -146,42 +172,40 @@ function getRequest(newUrl){
             console.log('nopes');
             alert('Sorry, we dont have enough questions for your query. Try Again.')
         }
-        
         else{ // returned results successfully
             console.log(json);
             removeBody();
             let theCards = json.results;
             var questionAt = 0;
             showCard(theCards,questionAt);
-            
-            //shows next question
-            $('.showNext').on('click', () => {
-                questionAt += 1;
-                showCard(theCards,questionAt);
-                console.log('correct' + theCards[questionAt].correct_answer);
+             //shows next question
+             $('.showNext').on('click', () => {
+                 if(questionAt == theCards.length - 1){ // user answered all questions
+                     showEnd(questionAt + 1);
+                 }
+                 else{
+                    questionAt += 1;
+                    showCard(theCards,questionAt);
+                    console.log('correct' + theCards[questionAt].correct_answer);
+                 }
             });
-            
-            $('div.showChoices').click(function() {
+            $('div.showChoices').off('click').on('click',function() {
                 var text = $(this).text();
                 console.log(text);
                 
                 if(theCards[questionAt].correct_answer == text){
                     alert('u got it');
                     // turnGreen(this)
+                    $('.showNext').removeClass('hide');
+                    $('.restart').addClass('hide');
                 }
-            
-            });
-
-         
-            
-                    
+                else{
+                    $('.restart').removeClass('hide');
+                    disableClicks();
+                }
+            });          
         }
         return json;
     }
     request()
-    // mainGame.then(res => console.log(res))
-    // //console.log(mainGame.then(console.log))
 }
-
-
-

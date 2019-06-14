@@ -53,6 +53,7 @@ body{
     margin: 20px 0px;
     border-radius: 5px;
     
+    
 }
     .choose{
         flex-basis: 100%;
@@ -250,16 +251,26 @@ body{
 }
 .showNext{
     margin-top: 20px;
+    flex-basis: 100%;
 }
 
 .showNext:hover{
     font-weight: bold;
     margin-top: 20px;
 }
-
+.restart{
+    margin-top: 20px;
+    flex-basis: 100%;
+}
+.restart:hover{
+    font-weight: bold;
+    margin-top: 20px;
+}
 
 
 .hide{
     display: none;
 }
-
+.flex{
+    display: flex;
+}
