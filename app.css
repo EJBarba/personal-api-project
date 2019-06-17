@@ -44,7 +44,7 @@ body{
     width: 360px;
     border-radius: 25px;
     color: #37474F;
-    box-shadow: 15px 30px 18px; 
+    /* box-shadow: 15px 30px 18px;  */
 }
 
 .body input{
@@ -220,7 +220,7 @@ body{
     width: 360px;
     border-radius: 25px;
     color: #37474F;
-    box-shadow: 15px 30px 18px; 
+    /* box-shadow: 15px 30px 18px;  */
 }
 .showChoices{
     flex-basis: 40%;

@@ -141,7 +141,7 @@ function showCard(resultsArray, questionAt){
 
 } 
 
-function showEnd(questionAt,score, length){
+function showEnd(questionAt,score){
     //resets the card
     console.log('%cRESTART','color:orange; font-size:20px;');
     $('.showNext').addClass('hide');
@@ -171,6 +171,7 @@ function turnGreen(correct_answer){
         "background-color": "#D3D3D3",
         "font-weight": "bolder"
       });
+      
       $(`div.showChoices:contains(${correct_answer})`).css({
         "background-color": "green",
         "color": "white",
@@ -234,7 +235,7 @@ function getRequest(newUrl){
              $('.showNext').on('click', () => {
                  if(questionAt == theCards.length - 1){ // user answered all questions
                     let len = theCards.length -1;
-                     showEnd(questionAt + 1, score, len);
+                     showEnd(questionAt + 1, score);
                      console.log('%cQUESTION AT ' + len,"color:tomato; font-weight: bold; font-size:20px;" );
                  }
                  else{
@@ -245,22 +246,30 @@ function getRequest(newUrl){
             });
             
             $('div.showChoices').off('click').on('click',function() {
-                var text = $(this).text();
-                console.log(text);
-                
-                if(theCards[questionAt].correct_answer == text){
+                 var text = $(this).text();
+                //console.log(text);
+                var texts = $(this).html(text).text();
+                console.log('%c This'+ text , 'color:magenta; font-weight: bold;');
+               console.log('%c TEXTs'+ texts , 'color:magenta; font-weight: bold;');
+               console.log('%c alalu'+ theCards[questionAt].correct_answer , 'color:magenta; font-weight: bold;');
+               
+               var correctAnswer = he.decode(theCards[questionAt].correct_answer);
+                console.log(correctAnswer);
+                if(correctAnswer == texts){
                     addScore();
                     console.log("%c SCOOORE" + score,'color:blue; font-weight: bold; font-size: 20px');
                     $('.showNext').removeClass('hide');
                     $('.restart').addClass('hide');
                     disableClicks();
-                    turnGreen(theCards[questionAt].correct_answer);
+                    
+                    turnGreen(correctAnswer);
                 }
                 else{
                     $('.showNext').removeClass('hide');
                     //$('.restart').removeClass('hide');
                     disableClicks();
-                    turnRed(theCards[questionAt].correct_answer);
+                    var correctAnswer = he.decode(theCards[questionAt].correct_answer);
+                    turnRed(correctAnswer);
                     
                 }
             });          
